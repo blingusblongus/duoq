@@ -12,6 +12,21 @@ const User = defineTable({
         id: column.text({
             primaryKey: true,
         }),
+        puuid: column.text({
+            unique: true,
+        }),
+        game_name: column.text(),
+        tag_line: column.text(),
+    },
+});
+
+const Summoner = defineTable({
+    columns: {
+        puuid: column.text({
+            primaryKey: true,
+        }),
+        game_name: column.text(),
+        tag_line: column.text(),
     },
 });
 
@@ -28,5 +43,5 @@ const Session = defineTable({
 });
 
 export default defineDb({
-    tables: { Comment, User, Session },
+    tables: { Comment, User, Session, Summoner },
 });

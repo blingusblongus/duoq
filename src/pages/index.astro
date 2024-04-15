@@ -9,7 +9,7 @@ import {LoginButton} from "../components/LoginButton.tsx";
 const comment = await db.select().from(Comment);
 const user = Astro.locals.user;
 const session = Astro.locals.session;
-console.log(Astro.locals);
+// console.log(Astro.locals);
 ---
 
 <Layout title="Welcome to Astro.">
@@ -22,7 +22,7 @@ console.log(Astro.locals);
         </form>}
 
         <code>{JSON.stringify(comment)}</code>
-        <code>{user?.id || "no user"}</code>
-        <code>{session?.id || "no session"}</code>
+        <code>{user ? (user.gameName + "#" + user.tagLine) : "not available"}</code>
+        <!-- <code>{session?.id || "no session"}</code> -->
     </main>
 </Layout>

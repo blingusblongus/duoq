@@ -10,6 +10,12 @@ export const lucia = new Lucia(adapter, {
             secure: import.meta.env.PROD,
         },
     },
+    getUserAttributes: (attributes) => {
+        return {
+            gameName: attributes.game_name,
+            tagLine: attributes.tag_line,
+        };
+    },
 });
 
 declare module "lucia" {

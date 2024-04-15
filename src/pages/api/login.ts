@@ -1,7 +1,12 @@
 import { lucia } from "@/auth";
 import type { APIContext } from "astro";
-import { User, db, eq } from "astro:db";
+import { Summoner, User, and, db, eq } from "astro:db";
 
+type SummonerResponse = {
+    puuid: string;
+    gameName: string;
+    tagLine: string;
+};
 export async function POST(context: APIContext): Promise<Response> {
     const formData = await context.request.formData();
 
@@ -11,23 +16,65 @@ export async function POST(context: APIContext): Promise<Response> {
         return new Response("Invalid Summoner id", { status: 400 });
     }
 
-    const existing = await db.select().from(User).where(eq(User.id, id)).get();
-    console.log("existing", existing, "id:", id);
+    const [gameName, tagline] = id.split("#");
 
-    if (!existing) {
-        await db.insert(User).values({ id });
+    if (!gameName || !tagline) {
+        return new Response("Invalid Summoner id", { status: 400 });
     }
+
+    const existing = await db
+        .select()
+        .from(User)
+        .where(and(eq(User.tag_line, tagline), eq(User.game_name, gameName)))
+        .get();
 
     if (context.locals.session) {
         await lucia.invalidateSession(context.locals.session.id);
+        console.log("session invalidated");
     }
-    const session = await lucia.createSession(id, {});
-    const sessionCookie = lucia.createSessionCookie(session.id);
-    context.cookies.set(
-        sessionCookie.name,
-        sessionCookie.value,
-        sessionCookie.attributes,
-    );
+
+    if (!existing) {
+        console.log("hitting api");
+        const riotResponse = await fetch(
+            `https://americas.api.riotgames.com/riot/account/v1/accounts/by-riot-id/${gameName}/${tagline}`,
+            { headers: { "X-Riot-Token": import.meta.env.RIOT_API_KEY } },
+        );
+
+        if (riotResponse.status !== 200) {
+            return new Response("Summoner not found", { status: 400 });
+        }
+
+        const {
+            puuid,
+            gameName: game_name,
+            tagLine: tag_line,
+        } = (await riotResponse.json()) as SummonerResponse;
+
+        await db.insert(User).values([
+            {
+                id: puuid,
+                puuid,
+                game_name,
+                tag_line,
+            },
+        ]);
+
+        const session = await lucia.createSession(puuid, {});
+        const sessionCookie = lucia.createSessionCookie(session.id);
+        context.cookies.set(
+            sessionCookie.name,
+            sessionCookie.value,
+            sessionCookie.attributes,
+        );
+    } else {
+        const session = await lucia.createSession(existing.puuid, {});
+        const sessionCookie = lucia.createSessionCookie(session.id);
+        context.cookies.set(
+            sessionCookie.name,
+            sessionCookie.value,
+            sessionCookie.attributes,
+        );
+    }
 
     return context.redirect("/");
 }
