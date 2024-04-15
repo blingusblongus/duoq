@@ -2,10 +2,14 @@
 import Layout from "../layouts/Layout.astro";
 import Card from "../components/Card.astro";
 import { Button } from "../components/ui/button";
+import { db, Comment } from "astro:db";
+
+const comment = await db.select().from(Comment);
 ---
 
 <Layout title="Welcome to Astro.">
     <main>
         <Button>Hello</Button>
+        <code>{JSON.stringify(comment)}</code>
     </main>
 </Layout>
