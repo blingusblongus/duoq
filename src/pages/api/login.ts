@@ -1,6 +1,6 @@
 import { lucia } from "@/auth";
 import type { APIContext } from "astro";
-import { Summoner, User, and, db, eq } from "astro:db";
+import { Summoner, User, and, db, eq, like } from "astro:db";
 
 type SummonerResponse = {
     puuid: string;
@@ -22,11 +22,20 @@ export async function POST(context: APIContext): Promise<Response> {
         return new Response("Invalid Summoner id", { status: 400 });
     }
 
+    console.log("searching for ", gameName + "#" + tagline);
+
+    const all = await db.select().from(User);
+
+    console.log(all);
     const existing = await db
         .select()
         .from(User)
-        .where(and(eq(User.tag_line, tagline), eq(User.game_name, gameName)))
+        .where(
+            and(like(User.tag_line, tagline), like(User.game_name, gameName)),
+        )
         .get();
+
+    console.log(existing);
 
     if (context.locals.session) {
         await lucia.invalidateSession(context.locals.session.id);
