@@ -7,6 +7,26 @@ const Comment = defineTable({
     },
 });
 
+const User = defineTable({
+    columns: {
+        id: column.text({
+            primaryKey: true,
+        }),
+    },
+});
+
+const Session = defineTable({
+    columns: {
+        id: column.text({
+            primaryKey: true,
+        }),
+        expiresAt: column.date(),
+        userId: column.text({
+            references: () => User.columns.id,
+        }),
+    },
+});
+
 export default defineDb({
-    tables: { Comment },
+    tables: { Comment, User, Session },
 });

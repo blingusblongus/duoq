@@ -2,14 +2,27 @@
 import Layout from "../layouts/Layout.astro";
 import Card from "../components/Card.astro";
 import { Button } from "../components/ui/button";
+import {Input} from "../components/ui/input.tsx";
 import { db, Comment } from "astro:db";
+import {LoginButton} from "../components/LoginButton.tsx";
 
 const comment = await db.select().from(Comment);
+const user = Astro.locals.user;
+const session = Astro.locals.session;
+console.log(Astro.locals);
 ---
 
 <Layout title="Welcome to Astro.">
     <main>
         <Button>Hello</Button>
+
+<form method="POST" action="api/login">
+    <Input type="text" name="id"/>
+    <Button>{session ? "Switch User" : "Set User"}</Button>
+        </form>}
+
         <code>{JSON.stringify(comment)}</code>
+        <code>{user?.id || "no user"}</code>
+        <code>{session?.id || "no session"}</code>
     </main>
 </Layout>

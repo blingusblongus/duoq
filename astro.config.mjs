@@ -6,7 +6,17 @@ import db from "@astrojs/db";
 
 // https://astro.build/config
 export default defineConfig({
-  integrations: [tailwind({
-    applyBaseStyles: false
-  }), react(), db()]
+    integrations: [
+        tailwind({
+            applyBaseStyles: false,
+        }),
+        react(),
+        db(),
+    ],
+    vite: {
+        optimizeDeps: {
+            exclude: ["oslo", "astro:db"],
+        },
+    },
+    output: "server",
 });
