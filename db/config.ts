@@ -30,6 +30,14 @@ const Summoner = defineTable({
     },
 });
 
+const Match = defineTable({
+    columns: {
+        id: column.text({
+            primaryKey: true,
+        }),
+    },
+});
+
 const Session = defineTable({
     columns: {
         id: column.text({
@@ -43,5 +51,5 @@ const Session = defineTable({
 });
 
 export default defineDb({
-    tables: { Comment, User, Session, Summoner },
+    tables: { Comment, User, Session, Summoner, Match },
 });

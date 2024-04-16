@@ -20,22 +20,19 @@ export const onRequest = defineMiddleware(async (context, next) => {
     const sessionId =
         context.cookies.get(lucia.sessionCookieName)?.value ?? null;
 
-    console.log("sessionId", sessionId);
     if (!sessionId) {
         context.locals.user = null;
         context.locals.session = null;
         return next();
     }
 
-    console.log("validating", sessionId);
     const { session, user } = await lucia.validateSession(sessionId);
-    console.log("validated", session, user);
     if (session && session.fresh) {
         const sessionCookie = lucia.createSessionCookie(session.id);
         context.cookies.set(
             sessionCookie.name,
             sessionCookie.value,
-            sessionCookie.attributes,
+            // sessionCookie.attributes,
         );
     }
     if (!session) {
@@ -44,7 +41,7 @@ export const onRequest = defineMiddleware(async (context, next) => {
         context.cookies.set(
             sessionCookie.name,
             sessionCookie.value,
-            sessionCookie.attributes,
+            // sessionCookie.attributes,
         );
     }
     context.locals.session = session;

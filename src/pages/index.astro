@@ -9,9 +9,6 @@ import {LoginButton} from "../components/LoginButton.tsx";
 const comment = await db.select().from(Comment);
 const user = Astro.locals.user;
 const session = Astro.locals.session;
-
-console.log(user, session)
-// console.log(Astro.locals);
 ---
 
 <Layout title="Welcome to Astro.">
