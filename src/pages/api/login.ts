@@ -24,9 +24,6 @@ export async function POST(context: APIContext): Promise<Response> {
 
     console.log("searching for ", gameName + "#" + tagline);
 
-    const all = await db.select().from(User);
-
-    console.log(all);
     const existing = await db
         .select()
         .from(User)
@@ -62,6 +59,7 @@ export async function POST(context: APIContext): Promise<Response> {
         await db.insert(User).values([
             {
                 id: puuid,
+                userId: puuid,
                 puuid,
                 game_name,
                 tag_line,

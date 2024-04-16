@@ -9,20 +9,19 @@ import {LoginButton} from "../components/LoginButton.tsx";
 const comment = await db.select().from(Comment);
 const user = Astro.locals.user;
 const session = Astro.locals.session;
+
+console.log(user, session)
 // console.log(Astro.locals);
 ---
 
 <Layout title="Welcome to Astro.">
     <main>
-        <Button>Hello</Button>
+        <form method="POST" action="/api/update">
+            <Button>Update</Button>
+        </form>
 
-<form method="POST" action="api/login">
-    <Input type="text" name="id"/>
-    <Button>{session ? "Switch User" : "Set User"}</Button>
-        </form>}
-
-        <code>{JSON.stringify(comment)}</code>
-        <code>{user ? (user.gameName + "#" + user.tagLine) : "not available"}</code>
+        <!-- <code>{JSON.stringify(comment)}</code> -->
+        <!-- <code>{user ? (user.gameName + "#" + user.tagLine) : "not available"}</code> -->
         <!-- <code>{session?.id || "no session"}</code> -->
     </main>
 </Layout>
