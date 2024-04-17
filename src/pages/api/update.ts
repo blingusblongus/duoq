@@ -1,12 +1,8 @@
-import { lucia } from "@/auth";
 import type { APIContext } from "astro";
 import { Match, db, eq, inArray, notExists, notInArray, sql } from "astro:db";
 
 export async function POST(context: APIContext): Promise<Response> {
     // Fetch Latest games
-    // RD33J--av8BMTN1OXIoRu3lGoQlHw1kYwv2GY5g6r43sEiWHg-TLoKgWoMZWNc8-e5wa7upon9klha
-
-    // const puuid = context.cookies.get(lucia.sessionCookieName)?.value ?? null;
     if (!context.locals.user) {
         return new Response("No user session", { status: 401 });
     }
@@ -39,12 +35,13 @@ export async function POST(context: APIContext): Promise<Response> {
         return new Response("error retrieving matches", { status: 500 });
     }
 
-    console.log(existing);
     const notExisting = matches.filter((id) => existing.includes(id));
 
-    console.log("notExisting", notExisting);
-
     // Add to Db if necessary
+
+    if (notExisting.length > 0) {
+        // Query Riot API and add them to the db
+    }
 
     // Reload page
     return context.redirect("/");
