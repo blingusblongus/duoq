@@ -31,6 +31,8 @@ export async function POST(context: APIContext): Promise<Response> {
 
     const notExisting = matches.filter((id) => existing.includes(id));
 
+    console.log(matches.length, notExisting.length);
+
     // Add to Db if necessary
 
     if (notExisting.length > 0) {
