@@ -1,3 +1,4 @@
+import { riotService, type Summoner } from "@/services/RiotService";
 import type { APIContext } from "astro";
 import { Match, db, eq, inArray, notExists, notInArray, sql } from "astro:db";
 
@@ -6,21 +7,14 @@ export async function POST(context: APIContext): Promise<Response> {
     if (!context.locals.user) {
         return new Response("No user session", { status: 401 });
     }
-    const { id } = context.locals.user;
+    // @ts-expect-error - for some reason, even changing declarating file doesn't seem to be fixing locals typing
+    const { puuid } = context.locals.user as Summoner;
 
-    const matches = (await fetch(
-        `https://americas.api.riotgames.com/lol/match/v5/matches/by-puuid/${id}/ids?start=0&count=20`,
-        {
-            headers: {
-                "X-Riot-Token": import.meta.env.RIOT_API_KEY,
-            },
-        },
-    )
-        .then((res) => res.json())
-        .catch((err) => console.log(err))) as string[];
+    const matches = await riotService.getMatches(puuid);
 
+    console.log(matches);
     if (!matches || matches.length === 0) {
-        console.log("no matches. id:", id);
+        console.log("no matches. puuid:", puuid);
         return new Response("No matches found", { status: 201 });
     }
 

@@ -1,4 +1,4 @@
-type Summoner = {
+export type Summoner = {
     puuid: string;
     gameName: string;
     tagLine: string;
@@ -28,6 +28,16 @@ class RiotService {
     public async getSummonerByRiotId(gameName: string, tagline: string) {
         return this.request<Summoner>(
             `https://americas.api.riotgames.com/riot/account/v1/accounts/by-riot-id/${gameName}/${tagline}`,
+        );
+    }
+
+    public async getMatches(
+        puuid: string,
+        start: number = 0,
+        count: number = 20,
+    ) {
+        return this.request<string[]>(
+            `https://americas.api.riotgames.com/lol/match/v5/matches/by-puuid/${puuid}/ids?start=${start}&count=${count}`,
         );
     }
 }
