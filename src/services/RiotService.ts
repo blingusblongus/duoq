@@ -1,3 +1,5 @@
+import type { FullMatch } from "db/examples/Match";
+
 export type Summoner = {
     puuid: string;
     gameName: string;
@@ -31,13 +33,19 @@ class RiotService {
         );
     }
 
-    public async getMatches(
+    public async getMatchIds(
         puuid: string,
         start: number = 0,
         count: number = 20,
     ) {
         return this.request<string[]>(
             `https://americas.api.riotgames.com/lol/match/v5/matches/by-puuid/${puuid}/ids?start=${start}&count=${count}`,
+        );
+    }
+
+    public async getMatchData(matchId: string) {
+        return this.request<FullMatch>(
+            `https://americas.api.riotgames.com/lol/match/v5/matches/${matchId}`,
         );
     }
 }

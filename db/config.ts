@@ -38,6 +38,23 @@ const Match = defineTable({
     },
 });
 
+const Summoner_Match = defineTable({
+    columns: {
+        id: column.number({ primaryKey: true }),
+        summonerId: column.text({
+            references: () => Summoner.columns.puuid,
+        }),
+        matchId: column.text({
+            references: () => Match.columns.id,
+        }),
+        win: column.boolean(),
+        championName: column.text(),
+        kills: column.number(),
+        deaths: column.number(),
+        assists: column.number(),
+    },
+});
+
 const Session = defineTable({
     columns: {
         id: column.text({
@@ -51,5 +68,5 @@ const Session = defineTable({
 });
 
 export default defineDb({
-    tables: { Comment, User, Session, Summoner, Match },
+    tables: { Comment, User, Session, Summoner, Match, Summoner_Match },
 });

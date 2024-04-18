@@ -1,6 +1,16 @@
 import { riotService, type Summoner } from "@/services/RiotService";
 import type { APIContext } from "astro";
-import { Match, db, eq, inArray, notExists, notInArray, sql } from "astro:db";
+import {
+    Match,
+    Summoner as SummonerTable,
+    Summoner_Match,
+    db,
+    eq,
+    inArray,
+    notExists,
+    notInArray,
+    sql,
+} from "astro:db";
 
 export async function POST(context: APIContext): Promise<Response> {
     // Fetch Latest games
@@ -10,7 +20,7 @@ export async function POST(context: APIContext): Promise<Response> {
     // @ts-expect-error - for some reason, even changing declarating file doesn't seem to be fixing locals typing
     const { puuid } = context.locals.user as Summoner;
 
-    const matches = await riotService.getMatches(puuid);
+    const matches = await riotService.getMatchIds(puuid, 0, 20);
 
     console.log(matches);
     if (!matches || matches.length === 0) {
@@ -37,7 +47,60 @@ export async function POST(context: APIContext): Promise<Response> {
 
     if (notExisting.length > 0) {
         // Query Riot API and add them to the db
+        //
+        const match_queries = [];
+        const summoner_queries = [];
+        const summoner_match_queries = [];
+
+        for (let matchId of notExisting) {
+            const {
+                info: { participants },
+            } = await riotService.getMatchData(matchId);
+
+            match_queries.push(db.insert(Match).values({ id: matchId }));
+
+            for (let {
+                win,
+                puuid,
+                championName,
+                kills,
+                deaths,
+                assists,
+                riotIdGameName,
+                riotIdTagline,
+            } of participants) {
+                summoner_queries.push(
+                    db
+                        .insert(SummonerTable)
+                        .values({
+                            puuid,
+                            game_name: riotIdGameName,
+                            tag_line: riotIdTagline,
+                        })
+                        .onConflictDoNothing(),
+                );
+                summoner_match_queries.push(
+                    db.insert(Summoner_Match).values({
+                        matchId,
+                        win,
+                        summonerId: puuid,
+                        championName,
+                        kills,
+                        deaths,
+                        assists,
+                    }),
+                );
+            }
+
+            await db.batch(match_queries);
+            await db.batch(summoner_queries);
+            await db.batch(summoner_match_queries);
+        }
     }
+
+    const summonerMatches = await db.select().from(Summoner_Match);
+
+    console.log(summonerMatches);
 
     // Reload page
     return context.redirect("/");
