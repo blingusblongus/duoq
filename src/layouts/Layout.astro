@@ -30,7 +30,7 @@ const user = Astro.locals.user;
                     </span>
                 )
             }
-            <a href="/login">Set User</a>
+            <a href="/login">{user ? "Switch Summoner" : "Set Summoner"}</a>
         </div>
         <slot />
     </body>
