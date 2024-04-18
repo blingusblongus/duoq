@@ -1,0 +1,13 @@
+---
+import Layout from "../layouts/Layout.astro";
+import { Button } from "../components/ui/button";
+import { Input } from "../components/ui/input";
+---
+
+<Layout title="Choose Summoner">
+    <div>Choose Summoner</div>
+    <form method="POST" action="/api/set-summoner">
+        <Input type="text" name="riot-id" />
+        <Button>Submit</Button>
+    </form>
+</Layout>

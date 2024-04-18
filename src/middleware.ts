@@ -17,34 +17,46 @@ export const onRequest = defineMiddleware(async (context, next) => {
         }
     }
 
-    const sessionId =
-        context.cookies.get(lucia.sessionCookieName)?.value ?? null;
+    if (context.url.pathname === "/api/set-summoner") return next();
+    if (context.url.pathname === "/login") return next();
 
-    if (!sessionId) {
-        context.locals.user = null;
-        context.locals.session = null;
-        return next();
+    const summonerDetailsCookie = context.cookies.get("summonerDetails");
+    console.log("summonerDetailsCookie", summonerDetailsCookie);
+
+    if (!summonerDetailsCookie) {
+        return context.redirect("/login");
     }
 
-    const { session, user } = await lucia.validateSession(sessionId);
-    if (session && session.fresh) {
-        const sessionCookie = lucia.createSessionCookie(session.id);
-        context.cookies.set(
-            sessionCookie.name,
-            sessionCookie.value,
-            // sessionCookie.attributes,
-        );
-    }
-    if (!session) {
-        console.log("invalidating cookie");
-        const sessionCookie = lucia.createBlankSessionCookie();
-        context.cookies.set(
-            sessionCookie.name,
-            sessionCookie.value,
-            // sessionCookie.attributes,
-        );
-    }
-    context.locals.session = session;
-    context.locals.user = user;
     return next();
+
+    // const sessionId =
+    //     context.cookies.get(lucia.sessionCookieName)?.value ?? null;
+    //
+    // if (!sessionId) {
+    //     context.locals.user = null;
+    //     context.locals.session = null;
+    //     return next();
+    // }
+    //
+    // const { session, user } = await lucia.validateSession(sessionId);
+    // if (session && session.fresh) {
+    //     const sessionCookie = lucia.createSessionCookie(session.id);
+    //     context.cookies.set(
+    //         sessionCookie.name,
+    //         sessionCookie.value,
+    //         // sessionCookie.attributes,
+    //     );
+    // }
+    // if (!session) {
+    //     console.log("invalidating cookie");
+    //     const sessionCookie = lucia.createBlankSessionCookie();
+    //     context.cookies.set(
+    //         sessionCookie.name,
+    //         sessionCookie.value,
+    //         // sessionCookie.attributes,
+    //     );
+    // }
+    // context.locals.session = session;
+    // context.locals.user = user;
+    // return next();
 });

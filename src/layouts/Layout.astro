@@ -9,6 +9,10 @@ interface Props {
 
 const { title } = Astro.props;
 const user = Astro.locals.user;
+
+const summonerCookie = Astro.cookies.get("summoner");
+
+console.log(summonerCookie);
 ---
 
 <!doctype html>
