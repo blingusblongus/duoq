@@ -35,6 +35,10 @@ const Match = defineTable({
         id: column.text({
             primaryKey: true,
         }),
+        gameDuration: column.number(),
+        gameMode: column.text(),
+        gameType: column.text(),
+        gameVersion: column.text(),
     },
 });
 

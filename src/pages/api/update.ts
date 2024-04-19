@@ -59,10 +59,26 @@ export async function POST(context: APIContext): Promise<Response> {
 
         for (let matchId of notExisting) {
             const {
-                info: { participants },
+                info: {
+                    participants,
+                    gameDuration,
+                    gameMode,
+                    gameType,
+                    gameVersion,
+                },
             } = await riotService.getMatchData(matchId);
 
-            match_queries.push(db.insert(Match).values({ id: matchId }));
+            match_queries.push(
+                db
+                    .insert(Match)
+                    .values({
+                        id: matchId,
+                        gameDuration,
+                        gameMode,
+                        gameType,
+                        gameVersion,
+                    }),
+            );
 
             for (let {
                 win,
