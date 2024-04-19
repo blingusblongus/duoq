@@ -1,25 +1,5 @@
 import { defineDb, defineTable, column } from "astro:db";
 
-const Comment = defineTable({
-    columns: {
-        author: column.text(),
-        body: column.text(),
-    },
-});
-
-const User = defineTable({
-    columns: {
-        id: column.text({
-            primaryKey: true,
-        }),
-        puuid: column.text({
-            unique: true,
-        }),
-        game_name: column.text(),
-        tag_line: column.text(),
-    },
-});
-
 const Summoner = defineTable({
     columns: {
         puuid: column.text({
@@ -27,6 +7,8 @@ const Summoner = defineTable({
         }),
         game_name: column.text(),
         tag_line: column.text(),
+        games_tracked: column.number({ default: 1 }),
+        games_won: column.number({ default: 0 }),
     },
 });
 
@@ -56,21 +38,12 @@ const Summoner_Match = defineTable({
         kills: column.number(),
         deaths: column.number(),
         assists: column.number(),
+        individualPosition: column.text(),
+        teamPosition: column.text(),
     },
-});
-
-const Session = defineTable({
-    columns: {
-        id: column.text({
-            primaryKey: true,
-        }),
-        expiresAt: column.date(),
-        userId: column.text({
-            references: () => User.columns.id,
-        }),
-    },
+    indexes: {},
 });
 
 export default defineDb({
-    tables: { Comment, User, Session, Summoner, Match, Summoner_Match },
+    tables: { Summoner, Match, Summoner_Match },
 });

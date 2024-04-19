@@ -1,6 +1,14 @@
 ---
 import Layout from "../layouts/Layout.astro";
 import { Button } from "../components/ui/button";
+import { Summoner, db, eq } from "astro:db";
+
+const user = Astro.locals.user;
+const summonerStats = await db
+    .select()
+    .from(Summoner)
+    .where(eq(Summoner.puuid, user?.puuid!))
+    .get();
 ---
 
 <Layout title="Welcome to Astro.">
@@ -8,6 +16,9 @@ import { Button } from "../components/ui/button";
         <form method="POST" action="/api/update">
             <Button>Update</Button>
         </form>
+        <pre>
+            {JSON.stringify(summonerStats, null, 2)}
+        </pre>
         <!-- <code>{JSON.stringify(comment)}</code> -->
         <!-- <code>{user ? (user.gameName + "#" + user.tagLine) : "not available"}</code> -->
         <!-- <code>{session?.id || "no session"}</code> -->

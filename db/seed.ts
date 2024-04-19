@@ -1,9 +1,7 @@
-import { db, Comment, Match } from "astro:db";
+import { db } from "astro:db";
 
 // https://astro.build/db/seed
 export default async function seed() {
-    await db.insert(Comment).values([{ author: "Me", body: "my comment" }]);
-
     // const matches = [
     //     "NA1_4975131718",
     //     "NA1_4975121191",
