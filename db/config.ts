@@ -41,7 +41,7 @@ const Summoner_Match = defineTable({
         individualPosition: column.text(),
         teamPosition: column.text(),
     },
-    indexes: {},
+    indexes: [{ on: "summonerId" }],
 });
 
 export default defineDb({
