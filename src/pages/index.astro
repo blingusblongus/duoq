@@ -3,6 +3,10 @@ import Layout from "../layouts/Layout.astro";
 import { Button } from "../components/ui/button";
 import { Summoner, db, eq } from "astro:db";
 import { Summoner_Match } from "astro:db";
+import { Card } from "../components/ui/card";
+import { Separator } from "../components/ui/separator";
+import { riotService } from "@/services/RiotService";
+import clsx from "clsx";
 
 const user = Astro.locals.user;
 const puuid = user?.puuid!;
@@ -29,7 +33,7 @@ if (puuid) {
 }
 ---
 
-<Layout title="Welcome to Astro.">
+<Layout title="DuoQ | Dashboard">
     <main>
         <form method="POST" action="/api/update">
             <Button>Update</Button>
@@ -37,11 +41,36 @@ if (puuid) {
         <pre>
             {JSON.stringify(summonerStats, null, 2)}
         </pre>
-        <pre>
-            {JSON.stringify(recentGames, null, 2)}
-        </pre>
-        <!-- <code>{JSON.stringify(comment)}</code> -->
-        <!-- <code>{user ? (user.gameName + "#" + user.tagLine) : "not available"}</code> -->
-        <!-- <code>{session?.id || "no session"}</code> -->
+
+        <Separator className="my-3" />
+
+        <h1 class="text-2xl font-extrabold">Recent Games</h1>
+        {
+            recentGames &&
+                recentGames.map(
+                    ({ championName, win, kills, deaths, assists }) => {
+                        return (
+                            <Card
+                                className={clsx([
+                                    "grid grid-cols-4 p-2",
+                                    win ? "bg-green-900" : "bg-red-900",
+                                ])}
+                            >
+                                <img
+                                    width="30px"
+                                    height="30px"
+                                    src={riotService.getSquareImgUrl(
+                                        championName,
+                                    )}
+                                    alt={championName}
+                                />
+                                <div>
+                                    {kills} / {deaths} / {assists}
+                                </div>
+                            </Card>
+                        );
+                    },
+                )
+        }
     </main>
 </Layout>

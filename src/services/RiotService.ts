@@ -48,6 +48,10 @@ class RiotService {
             `https://americas.api.riotgames.com/lol/match/v5/matches/${matchId}`,
         );
     }
+
+    public getSquareImgUrl(championName: string) {
+        return `https://ddragon.leagueoflegends.com/cdn/14.8.1/img/champion/${championName}.png`;
+    }
 }
 
 export const riotService = new RiotService();
