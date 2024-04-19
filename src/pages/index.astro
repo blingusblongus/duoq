@@ -34,15 +34,29 @@ if (puuid) {
 ---
 
 <Layout title="DuoQ | Dashboard">
-    <main>
+    <main class="m-3 flex flex-col gap-2">
         <form method="POST" action="/api/update">
-            <Button>Update</Button>
+            <Button>Refresh</Button>
         </form>
-        <pre>
-            {JSON.stringify(summonerStats, null, 2)}
-        </pre>
+        <!-- <pre> -->
+        <!--     {JSON.stringify(summonerStats, null, 2)} -->
+        <!-- </pre> -->
 
-        <Separator className="my-3" />
+        {
+            summonerStats && (
+                <div>
+                    Games Tracked: {summonerStats.games_tracked} | Win%:{" "}
+                    {(
+                        (summonerStats.games_won /
+                            summonerStats.games_tracked) *
+                        100
+                    ).toFixed(2)}
+                    %{" "}
+                </div>
+            )
+        }
+
+        <Separator />
 
         <h1 class="text-2xl font-extrabold">Recent Games</h1>
         {
@@ -52,8 +66,10 @@ if (puuid) {
                         return (
                             <Card
                                 className={clsx([
-                                    "grid grid-cols-4 p-2",
-                                    win ? "bg-green-900" : "bg-red-900",
+                                    "grid grid-cols-4 p-2 transition-all hover:scale-[1.02]",
+                                    win
+                                        ? "bg-green-900 hover:bg-green-800"
+                                        : "bg-red-900 hover:bg-red-800",
                                 ])}
                             >
                                 <img
