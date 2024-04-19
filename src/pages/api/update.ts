@@ -5,11 +5,7 @@ import {
     Summoner as SummonerTable,
     Summoner_Match,
     db,
-    eq,
     inArray,
-    notExists,
-    notInArray,
-    sql,
 } from "astro:db";
 
 export async function POST(context: APIContext): Promise<Response> {
@@ -20,7 +16,7 @@ export async function POST(context: APIContext): Promise<Response> {
     // @ts-expect-error - for some reason, even changing declarating file doesn't seem to be fixing locals typing
     const { puuid } = context.locals.user as Summoner;
 
-    const matches = await riotService.getMatchIds(puuid, 0, 20);
+    const matches = await riotService.getMatchIds(puuid, 0, 5);
 
     console.log(matches);
     if (!matches || matches.length === 0) {
@@ -41,6 +37,18 @@ export async function POST(context: APIContext): Promise<Response> {
 
     const notExisting = matches.filter((id) => existing.includes(id));
 
+    console.log(
+        "These matches already exist",
+        matches,
+        "\nCount:",
+        matches.length,
+    );
+    console.log(
+        "These matches are new",
+        notExisting,
+        "\nCount:",
+        notExisting.length,
+    );
     console.log(matches.length, notExisting.length);
 
     // Add to Db if necessary
