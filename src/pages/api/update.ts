@@ -35,7 +35,7 @@ export async function POST(context: APIContext): Promise<Response> {
         return new Response("error retrieving matches", { status: 500 });
     }
 
-    const notExisting = matches.filter((id) => existing.includes(id));
+    const notExisting = matches.filter((id) => !existing.includes(id));
 
     console.log(
         "These matches already exist",
@@ -49,10 +49,8 @@ export async function POST(context: APIContext): Promise<Response> {
         "\nCount:",
         notExisting.length,
     );
-    console.log(matches.length, notExisting.length);
 
     // Add to Db if necessary
-
     if (notExisting.length > 0) {
         // Query Riot API and add them to the db
         //
@@ -99,23 +97,22 @@ export async function POST(context: APIContext): Promise<Response> {
                     }),
                 );
             }
-
-            try {
-                // @ts-expect-error - this works despite type error
-                await db.batch(match_queries);
-                // @ts-expect-error - this works despite type error
-                await db.batch(summoner_queries);
-                // @ts-expect-error - this works despite type error
-                await db.batch(summoner_match_queries);
-            } catch (err) {
-                console.error(err);
-            }
+        }
+        try {
+            // @ts-expect-error - this works despite type error
+            await db.batch(match_queries);
+            // @ts-expect-error - this works despite type error
+            await db.batch(summoner_queries);
+            // @ts-expect-error - this works despite type error
+            await db.batch(summoner_match_queries);
+        } catch (err) {
+            console.error(err);
         }
     }
 
     const summonerMatches = await db.select().from(Summoner_Match);
 
-    console.log(summonerMatches);
+    console.log("all SUmmoner_match rows", summonerMatches);
 
     // Reload page
     return context.redirect("/");

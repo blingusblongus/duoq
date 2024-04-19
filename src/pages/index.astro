@@ -2,13 +2,16 @@
 import Layout from "../layouts/Layout.astro";
 import Card from "../components/Card.astro";
 import { Button } from "../components/ui/button";
-import {Input} from "../components/ui/input.tsx";
+import { Input } from "../components/ui/input.tsx";
 import { db, Comment } from "astro:db";
-import {LoginButton} from "../components/LoginButton.tsx";
+import { LoginButton } from "../components/LoginButton.tsx";
+import { Match } from "astro:db";
 
-const comment = await db.select().from(Comment);
 const user = Astro.locals.user;
 const session = Astro.locals.session;
+
+const matches = await db.select().from(Match);
+console.log("db matches", matches);
 ---
 
 <Layout title="Welcome to Astro.">
@@ -16,7 +19,6 @@ const session = Astro.locals.session;
         <form method="POST" action="/api/update">
             <Button>Update</Button>
         </form>
-
         <!-- <code>{JSON.stringify(comment)}</code> -->
         <!-- <code>{user ? (user.gameName + "#" + user.tagLine) : "not available"}</code> -->
         <!-- <code>{session?.id || "no session"}</code> -->
