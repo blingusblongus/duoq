@@ -53,7 +53,6 @@ export async function POST(context: APIContext): Promise<Response> {
     // Add to Db if necessary
     if (notExisting.length > 0) {
         // Query Riot API and add them to the db
-        //
         const match_queries = [];
         const summoner_queries = [];
         const summoner_match_queries = [];

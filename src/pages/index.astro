@@ -1,17 +1,6 @@
 ---
 import Layout from "../layouts/Layout.astro";
-import Card from "../components/Card.astro";
 import { Button } from "../components/ui/button";
-import { Input } from "../components/ui/input.tsx";
-import { db, Comment } from "astro:db";
-import { LoginButton } from "../components/LoginButton.tsx";
-import { Match } from "astro:db";
-
-const user = Astro.locals.user;
-const session = Astro.locals.session;
-
-const matches = await db.select().from(Match);
-console.log("db matches", matches);
 ---
 
 <Layout title="Welcome to Astro.">
