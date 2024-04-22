@@ -11,6 +11,7 @@ import {
 
 export async function POST(context: APIContext): Promise<Response> {
     // Fetch Latest games
+    // @ts-expect-error - for some reason, even changing declarating file doesn't seem to be fixing locals typing
     if (!context.locals.user) {
         return new Response("No user session", { status: 401 });
     }
