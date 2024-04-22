@@ -1,3 +1,4 @@
+import fs from "fs";
 import type { FullMatch } from "db/examples/Match";
 
 export type Summoner = {
@@ -15,7 +16,7 @@ class RiotService {
         }
     }
 
-    private async request<T>(url: string): Promise<T> {
+    public async request<T>(url: string): Promise<T> {
         const response = await fetch(url, {
             headers: { "X-Riot-Token": this.apiKey },
         });
@@ -54,4 +55,21 @@ class RiotService {
     }
 }
 
-export const riotService = new RiotService();
+class MockRiotService extends RiotService {
+    public async getMatchData(matchId: string): Promise<FullMatch> {
+        console.log("calling mock service");
+        try {
+            return JSON.parse(
+                fs.readFileSync("db/examples/matches/" + matchId + ".json", {
+                    encoding: "utf8",
+                }),
+            );
+        } catch (err) {
+            throw new Error("Match not found in examnples");
+        }
+    }
+}
+
+export const riotService = import.meta.env.DEV
+    ? new MockRiotService()
+    : new RiotService();

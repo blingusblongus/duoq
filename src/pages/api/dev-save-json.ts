@@ -1,8 +1,12 @@
 import { riotService } from "@/services/RiotService";
 import type { APIContext } from "astro";
+import type { FullMatch } from "db/examples/Match";
 import fs from "fs";
 
-export async function POST(context: APIContext) {
+/** This route is NOT available on prod, but is just a shorthand
+ * to populate local files for mocking the riot API
+ */
+export async function GET(context: APIContext) {
     // Disable route for PROD
     if (import.meta.env.PROD) {
         return new Response("Resource not found", { status: 404 });
@@ -26,16 +30,26 @@ export async function POST(context: APIContext) {
     try {
         for (let i = 0; i < matches.length; ++i) {
             const match = matches[i];
-            const res = await riotService.getMatchData(match);
-            if (!res) {
-                console.log("!res at ", i, "th match");
-                break;
+
+            // Get match if it doesn't exist
+            if (!fs.existsSync("./db/examples/matches/" + match + ".json")) {
+                console.log("downloading", match);
+                const res = await riotService.request<FullMatch>(
+                    `https://americas.api.riotgames.com/lol/match/v5/matches/${match}`,
+                );
+
+                if (!res) {
+                    console.log("!res at ", i, "th match");
+                    break;
+                }
+                fs.writeFile(
+                    destPath + match + ".json",
+                    JSON.stringify(res, null, 0),
+                    (err) => console.error(err),
+                );
+            } else {
+                console.log(match, "already downloaded");
             }
-            fs.writeFile(
-                destPath + match + ".json",
-                JSON.stringify(res, null, 0),
-                (err) => console.error(err),
-            );
         }
     } catch (err) {
         console.error(err);
