@@ -38,6 +38,8 @@ const Summoner_Match = defineTable({
         kills: column.number(),
         deaths: column.number(),
         assists: column.number(),
+        healing: column.number(),
+        damage: column.number(),
         individualPosition: column.text(),
         teamPosition: column.text(),
     },

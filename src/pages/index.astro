@@ -26,6 +26,8 @@ if (puuid) {
             kills: Summoner_Match.kills,
             deaths: Summoner_Match.deaths,
             assists: Summoner_Match.assists,
+            healing: Summoner_Match.healing,
+            damage: Summoner_Match.damage,
         })
         .from(Summoner_Match)
         .where(eq(Summoner_Match.summonerId, puuid))
@@ -63,7 +65,15 @@ if (puuid) {
         {
             recentGames &&
                 recentGames.map(
-                    ({ championName, win, kills, deaths, assists }) => {
+                    ({
+                        championName,
+                        win,
+                        kills,
+                        deaths,
+                        assists,
+                        healing,
+                        damage,
+                    }) => {
                         return (
                             <Card
                                 className={clsx([
@@ -84,6 +94,8 @@ if (puuid) {
                                 <div>
                                     {kills} / {deaths} / {assists}
                                 </div>
+                                <div>Heal: {healing}</div>
+                                <div>Damage: {damage}</div>
                             </Card>
                         );
                     },

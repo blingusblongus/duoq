@@ -17,9 +17,8 @@ export async function POST(context: APIContext): Promise<Response> {
     // @ts-expect-error - for some reason, even changing declarating file doesn't seem to be fixing locals typing
     const { puuid } = context.locals.user as Summoner;
 
-    const matches = await riotService.getMatchIds(puuid, 0, 5);
+    const matches = await riotService.getMatchIds(puuid, 0, 10);
 
-    console.log(matches);
     if (!matches || matches.length === 0) {
         console.log("no matches. puuid:", puuid);
         return new Response("No matches found", { status: 201 });
@@ -89,7 +88,9 @@ export async function POST(context: APIContext): Promise<Response> {
                 individualPosition,
                 teamPosition,
                 riotIdGameName,
+                totalHeal: healing,
                 riotIdTagline,
+                totalDamageDealtToChampions: damage,
             } of participants) {
                 summoner_queries.push(
                     db
@@ -118,6 +119,8 @@ export async function POST(context: APIContext): Promise<Response> {
                         kills,
                         deaths,
                         assists,
+                        healing,
+                        damage,
                         individualPosition,
                         teamPosition,
                     }),
@@ -136,12 +139,6 @@ export async function POST(context: APIContext): Promise<Response> {
             console.error(err);
         }
     }
-
-    // const summonerMatches = await db.select().from(Summoner_Match);
-    // console.log("all SUmmoner_match rows", summonerMatches);
-    //
-    const summoners = await db.select().from(SummonerTable);
-    console.log("all summoners", summoners);
 
     // Reload page
     return context.redirect("/");
