@@ -1,19 +1,19 @@
 ---
 import Layout from "../layouts/Layout.astro";
 import { Button } from "../components/ui/button";
-import { Summoner, db, desc, eq } from "astro:db";
-import { Summoner_Match } from "astro:db";
+import { Summoner, db, desc, eq, Summoner_Match, Tracked_Duo } from "astro:db";
 import { Card } from "../components/ui/card";
 import { Separator } from "../components/ui/separator";
 import { riotService } from "@/services/RiotService";
 import clsx from "clsx";
 import { Input } from "@/components/ui/input";
+import { or } from "astro:db";
 
 // @ts-expect-error - some typing problem with env.d.ts
 const user = Astro.locals.user;
 const puuid = user?.puuid!;
 
-let recentGames, summonerStats;
+let recentGames, summonerStats, tracked_duos;
 if (puuid) {
     summonerStats = await db
         .select()
@@ -35,6 +35,15 @@ if (puuid) {
         .where(eq(Summoner_Match.summonerId, puuid))
         .limit(10)
         .orderBy(desc(Summoner_Match.matchId));
+    tracked_duos = await db
+        .select()
+        .from(Tracked_Duo)
+        .where(
+            or(
+                eq(Tracked_Duo.summoner1, puuid),
+                eq(Tracked_Duo.summoner2, puuid),
+            ),
+        );
 }
 ---
 
@@ -51,6 +60,21 @@ if (puuid) {
             />
             <Button>Track New User</Button>
         </form>
+
+        {
+            tracked_duos && (
+                <div>
+                    {tracked_duos.map((duo) => {
+                        return (
+                            <div>
+                                {duo.summoner1} {duo.summoner2} winrate:{" "}
+                                {duo.won_matches / duo.total_matches}
+                            </div>
+                        );
+                    })}
+                </div>
+            )
+        }
 
         {
             summonerStats && (

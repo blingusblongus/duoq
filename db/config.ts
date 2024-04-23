@@ -49,12 +49,8 @@ const Summoner_Match = defineTable({
 const Tracked_Duo = defineTable({
     columns: {
         id: column.number({ primaryKey: true }),
-        summoner1: column.text({
-            references: () => Summoner.columns.puuid,
-        }),
-        summoner2: column.text({
-            references: () => Summoner.columns.puuid,
-        }),
+        summoner1: column.text({}),
+        summoner2: column.text({}),
         total_matches: column.number({
             default: 0,
         }),
