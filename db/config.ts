@@ -51,6 +51,8 @@ const Tracked_Duo = defineTable({
         id: column.number({ primaryKey: true }),
         summoner1: column.text({}),
         summoner2: column.text({}),
+        showSum1: column.boolean({ default: false }),
+        showSum2: column.boolean({ default: false }),
         total_matches: column.number({
             default: 0,
         }),

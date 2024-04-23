@@ -45,7 +45,7 @@ if (puuid) {
 
     const sq = sql`
     SELECT 
-        CONCAT(S1.game_name, '#', S1.tag_line) as summoner1, S2.game_name as summoner2, 
+        CONCAT(S1.game_name, '#', S1.tag_line) as summoner1, CONCAT(S2.game_name, '#', S2.tag_line) as summoner2, 
         ${Tracked_Duo.won_matches}, ${Tracked_Duo.total_matches}
     FROM ${Tracked_Duo}
     INNER JOIN ${Summoner} AS S1 ON S1.puuid = ${Tracked_Duo.summoner1}
@@ -92,7 +92,8 @@ if (puuid) {
                                 total_matches,
                             }) => {
                                 const otherSumm =
-                                    summoner1 === user.gameName
+                                    summoner1 ===
+                                    user.gameName + "#" + user.tagLine
                                         ? summoner2
                                         : summoner1;
                                 const winrate =

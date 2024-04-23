@@ -10,7 +10,6 @@ import {
 } from "astro:db";
 
 export async function POST(context: APIContext) {
-    console.log("hitting set-summoner");
     const formData = await context.request.formData();
     const riotId = formData.get("riot-id") || "";
 
@@ -29,8 +28,6 @@ export async function POST(context: APIContext) {
             tagLine,
         );
 
-        console.log(summonerDetails);
-
         const { puuid } = summonerDetails;
         await db
             .insert(Summoner_Table)
@@ -43,13 +40,12 @@ export async function POST(context: APIContext) {
             })
             .onConflictDoNothing();
 
+        // Sort summoners so they can be used to look up by idx
         const [s1, s2] = [
             // @ts-expect-error - context.locals.user type error
             context.locals.user.puuid as string,
             summonerDetails.puuid,
         ].sort();
-
-        console.log(s1, s2);
 
         const existing = await db
             .select()
