@@ -18,7 +18,7 @@ export async function POST(context: APIContext) {
     let summonerDetails;
     try {
         // Get Summoner Info
-        const summonerDetails = await riotService.getSummonerByRiotId(
+        summonerDetails = await riotService.getSummonerByRiotId(
             gameName,
             tagLine,
         );
