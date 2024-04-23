@@ -1,4 +1,4 @@
-import { riotService, type Summoner } from "@/services/RiotService";
+import { riotService } from "@/services/RiotService";
 import type { APIContext } from "astro";
 import {
     Tracked_Duo,
@@ -6,9 +6,7 @@ import {
     db,
     eq,
     and,
-    inArray,
-    Summoner_Match,
-    count,
+    sql,
 } from "astro:db";
 
 export async function POST(context: APIContext) {
@@ -31,6 +29,20 @@ export async function POST(context: APIContext) {
             tagLine,
         );
 
+        console.log(summonerDetails);
+
+        const { puuid } = summonerDetails;
+        await db
+            .insert(Summoner_Table)
+            .values({
+                puuid,
+                game_name: gameName,
+                tag_line: tagLine,
+                games_tracked: 0,
+                games_won: 0,
+            })
+            .onConflictDoNothing();
+
         const [s1, s2] = [
             // @ts-expect-error - context.locals.user type error
             context.locals.user.puuid as string,
@@ -42,14 +54,6 @@ export async function POST(context: APIContext) {
         const existing = await db
             .select()
             .from(Tracked_Duo)
-            // .leftJoin(
-            //     Summoner_Table,
-            //     eq(Tracked_Duo.summoner1, Summoner_Table.puuid),
-            // )
-            // .leftJoin(
-            //     Summoner_Table,
-            //     eq(Tracked_Duo.summoner2, Summoner_Table.puuid),
-            // )
             .where(
                 and(
                     eq(Tracked_Duo.summoner1, s1),
@@ -63,42 +67,34 @@ export async function POST(context: APIContext) {
             return context.redirect("/");
         }
 
-        // This should be a subquery, probably
-        const sharedMatches =
-            (
-                await db
-                    .selectDistinct({
-                        matchId: Summoner_Match.matchId,
-                    })
-                    .from(Summoner_Match)
-                    .where(and(inArray(Summoner_Match.summonerId, [s1, s2])))
-            ).length || 0;
-        const sharedWins =
-            (
-                await db
-                    .selectDistinct({
-                        matchId: Summoner_Match.matchId,
-                    })
-                    .from(Summoner_Match)
-                    .where(
-                        and(
-                            inArray(Summoner_Match.summonerId, [s1, s2]),
-                            eq(Summoner_Match.win, true),
-                        ),
-                    )
-            ).length || 0;
+        // If no existing tracked_duo record, aggregate one
+        const sq2 = sql`SELECT 
+        COUNT(DISTINCT a.matchId) AS total_matches,
+        SUM(CASE WHEN a.win = true THEN 1 ELSE 0 END) AS won_matches
+        FROM 
+            Summoner_Match a
+        JOIN 
+            Summoner_Match b ON a.matchId = b.matchId
+        WHERE 
+            a.summonerId = ${s1} AND b.summonerId = ${s2}`;
 
-        console.log(sharedWins, sharedMatches);
+        const shared_matches = (await db.run(sq2).then((res) => res.rows)) as {
+            total_matches: number;
+            won_matches: number;
+        }[];
+
+        const { total_matches, won_matches } = shared_matches[0];
 
         const res = await db
             .insert(Tracked_Duo)
             .values({
                 summoner1: s1,
                 summoner2: s2,
-                total_matches: sharedMatches,
-                won_matches: sharedWins,
+                total_matches: total_matches || 0,
+                won_matches: won_matches || 0,
             })
             .returning();
+
         console.log("Tracking added", res);
         return context.redirect("/");
     } catch (err) {

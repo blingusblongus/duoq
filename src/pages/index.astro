@@ -1,13 +1,20 @@
 ---
 import Layout from "../layouts/Layout.astro";
 import { Button } from "../components/ui/button";
-import { Summoner, db, desc, eq, Summoner_Match, Tracked_Duo } from "astro:db";
+import {
+    Summoner,
+    db,
+    desc,
+    eq,
+    Summoner_Match,
+    Tracked_Duo,
+    sql,
+} from "astro:db";
 import { Card } from "../components/ui/card";
 import { Separator } from "../components/ui/separator";
 import { riotService } from "@/services/RiotService";
 import clsx from "clsx";
 import { Input } from "@/components/ui/input";
-import { or } from "astro:db";
 
 // @ts-expect-error - some typing problem with env.d.ts
 const user = Astro.locals.user;
@@ -36,15 +43,18 @@ if (puuid) {
         .where(eq(Summoner.puuid, puuid))
         .get();
 
-    tracked_duos = await db
-        .select()
-        .from(Tracked_Duo)
-        .where(
-            or(
-                eq(Tracked_Duo.summoner1, puuid),
-                eq(Tracked_Duo.summoner2, puuid),
-            ),
-        );
+    const sq = sql`
+    SELECT 
+        CONCAT(S1.game_name, '#', S1.tag_line) as summoner1, S2.game_name as summoner2, 
+        ${Tracked_Duo.won_matches}, ${Tracked_Duo.total_matches}
+    FROM ${Tracked_Duo}
+    INNER JOIN ${Summoner} AS S1 ON S1.puuid = ${Tracked_Duo.summoner1}
+    INNER JOIN ${Summoner} AS S2 ON S2.puuid = ${Tracked_Duo.summoner2}
+    WHERE ${Tracked_Duo.summoner1} = ${puuid} 
+        OR ${Tracked_Duo.summoner2} = ${puuid};`;
+
+    tracked_duos = await db.run(sq).then((res) => res.rows);
+    console.log("Tracked Duos", tracked_duos);
 }
 ---
 
@@ -74,14 +84,31 @@ if (puuid) {
             {
                 tracked_duos && (
                     <div>
-                        {tracked_duos.map((duo) => {
-                            return (
-                                <div>
-                                    {duo.summoner1} {duo.summoner2} winrate:{" "}
-                                    {duo.won_matches / duo.total_matches}
-                                </div>
-                            );
-                        })}
+                        {tracked_duos.map(
+                            ({
+                                summoner1,
+                                summoner2,
+                                won_matches,
+                                total_matches,
+                            }) => {
+                                const otherSumm =
+                                    summoner1 === user.gameName
+                                        ? summoner2
+                                        : summoner1;
+                                const winrate =
+                                    typeof won_matches === "number" &&
+                                    typeof total_matches === "number"
+                                        ? (won_matches / total_matches).toFixed(
+                                              2,
+                                          )
+                                        : "unknkown";
+                                return (
+                                    <div>
+                                        {otherSumm} winrate: {winrate}
+                                    </div>
+                                );
+                            },
+                        )}
                     </div>
                 )
             }
