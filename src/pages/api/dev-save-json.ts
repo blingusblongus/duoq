@@ -13,10 +13,11 @@ export async function GET(context: APIContext) {
     }
 
     // Fetch Latest games
+    // @ts-expect-error - for some reason, even changing declaration file doesn't seem to be fixing locals typing
     if (!context.locals.user) {
         return new Response("No user session", { status: 401 });
     }
-    // @ts-expect-error - for some reason, even changing declarating file doesn't seem to be fixing locals typing
+    // @ts-expect-error - for some reason, even changing declaration file doesn't seem to be fixing locals typing
     const { puuid } = context.locals.user as Summoner;
 
     const destPath = "db/examples/matches/";

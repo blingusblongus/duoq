@@ -43,9 +43,26 @@ const Summoner_Match = defineTable({
         individualPosition: column.text(),
         teamPosition: column.text(),
     },
-    indexes: [{ on: "summonerId" }],
+    indexes: [{ on: ["summonerId", "matchId"] }],
+});
+
+const Tracked_Duo = defineTable({
+    columns: {
+        id: column.number({ primaryKey: true }),
+        summoner1: column.text({}),
+        summoner2: column.text({}),
+        showSum1: column.boolean({ default: false }),
+        showSum2: column.boolean({ default: false }),
+        total_matches: column.number({
+            default: 0,
+        }),
+        won_matches: column.number({
+            default: 0,
+        }),
+    },
+    indexes: [{ on: ["summoner1", "summoner2"] }],
 });
 
 export default defineDb({
-    tables: { Summoner, Match, Summoner_Match },
+    tables: { Summoner, Match, Summoner_Match, Tracked_Duo },
 });

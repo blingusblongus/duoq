@@ -4,13 +4,17 @@ import {
     Match,
     Summoner as SummonerTable,
     Summoner_Match,
+    Tracked_Duo,
+    and,
     db,
+    eq,
     inArray,
     sql,
 } from "astro:db";
 
 export async function POST(context: APIContext): Promise<Response> {
     // Fetch Latest games
+    // @ts-expect-error - for some reason, even changing declarating file doesn't seem to be fixing locals typing
     if (!context.locals.user) {
         return new Response("No user session", { status: 401 });
     }
@@ -56,9 +60,11 @@ export async function POST(context: APIContext): Promise<Response> {
         const match_queries = [];
         const summoner_queries = [];
         const summoner_match_queries = [];
+        const tracked_queries = [];
 
         for (let matchId of notExisting) {
             const {
+                metadata: { participants: participant_ids },
                 info: {
                     participants,
                     gameDuration,
@@ -126,6 +132,41 @@ export async function POST(context: APIContext): Promise<Response> {
                     }),
                 );
             }
+
+            const tracked = await db
+                .select({
+                    id: Tracked_Duo.id,
+                    s1: Tracked_Duo.summoner1,
+                    s2: Tracked_Duo.summoner2,
+                })
+                .from(Tracked_Duo)
+                .where(
+                    and(
+                        inArray(Tracked_Duo.summoner1, participant_ids),
+                        inArray(Tracked_Duo.summoner2, participant_ids),
+                    ),
+                )
+                .get();
+
+            // Update Tracking Aggregation
+            if (!tracked) continue;
+
+            const p1 = participants.find((p) => p.puuid === tracked.s1);
+            const p2 = participants.find((p) => p.puuid === tracked.s2);
+
+            // Guard against...
+            if (!p1 || !p2) continue; // either participant undefined
+            if (p1.teamId !== p2.teamId) continue; // participants on opposing teams
+
+            tracked_queries.push(
+                db
+                    .update(Tracked_Duo)
+                    .set({
+                        total_matches: sql`${Tracked_Duo.total_matches} + 1`,
+                        won_matches: sql`${Tracked_Duo.won_matches} + ${p1.win ? 1 : 0}`,
+                    })
+                    .where(eq(Tracked_Duo.id, tracked.id)),
+            );
         }
 
         try {
@@ -135,6 +176,8 @@ export async function POST(context: APIContext): Promise<Response> {
             await db.batch(summoner_queries);
             // @ts-expect-error - this works despite type error
             await db.batch(summoner_match_queries);
+            // @ts-expect-error - this works despite type error
+            await db.batch(tracked_queries);
         } catch (err) {
             console.error(err);
         }
