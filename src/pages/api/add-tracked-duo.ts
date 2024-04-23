@@ -85,7 +85,7 @@ export async function POST(context: APIContext) {
         const { total_matches, won_matches } = shared_matches[0];
 
         // TODO: Combine these calls into a single query
-        const insertedId = await db
+        const { id: insertedId } = await db
             .insert(Tracked_Duo)
             .values({
                 summoner1: s1,
@@ -93,7 +93,8 @@ export async function POST(context: APIContext) {
                 total_matches: total_matches || 0,
                 won_matches: won_matches || 0,
             })
-            .returning({ id: Tracked_Duo.id });
+            .returning({ id: Tracked_Duo.id })
+            .get();
 
         await db
             .insert(Tracked_Duo_Visibility)

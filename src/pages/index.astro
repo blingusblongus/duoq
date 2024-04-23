@@ -6,6 +6,7 @@ import {
     db,
     desc,
     eq,
+    Tracked_Duo_Visibility,
     Summoner_Match,
     Tracked_Duo,
     sql,
@@ -47,11 +48,11 @@ if (puuid) {
     SELECT 
         CONCAT(S1.game_name, '#', S1.tag_line) as summoner1, CONCAT(S2.game_name, '#', S2.tag_line) as summoner2, 
         ${Tracked_Duo.won_matches}, ${Tracked_Duo.total_matches}
-    FROM ${Tracked_Duo}
+    FROM ${Tracked_Duo_Visibility}
+    INNER JOIN ${Tracked_Duo} ON ${Tracked_Duo_Visibility.duo_id} = ${Tracked_Duo.id}
     INNER JOIN ${Summoner} AS S1 ON S1.puuid = ${Tracked_Duo.summoner1}
     INNER JOIN ${Summoner} AS S2 ON S2.puuid = ${Tracked_Duo.summoner2}
-    WHERE ${Tracked_Duo.summoner1} = ${puuid} 
-        OR ${Tracked_Duo.summoner2} = ${puuid};`;
+    WHERE ${Tracked_Duo_Visibility.visibleTo} = ${puuid}`;
 
     tracked_duos = await db.run(sq).then((res) => res.rows);
     console.log("Tracked Duos", tracked_duos);
