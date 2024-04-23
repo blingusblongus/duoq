@@ -7,6 +7,7 @@ import { Card } from "../components/ui/card";
 import { Separator } from "../components/ui/separator";
 import { riotService } from "@/services/RiotService";
 import clsx from "clsx";
+import { Input } from "@/components/ui/input";
 
 // @ts-expect-error - some typing problem with env.d.ts
 const user = Astro.locals.user;
@@ -41,6 +42,14 @@ if (puuid) {
     <main class="m-3 flex flex-col gap-2">
         <form method="POST" action="/api/update">
             <Button>Refresh</Button>
+        </form>
+        <form method="POST" action="/api/add-tracked-duo">
+            <Input
+                name="riot-id"
+                type="text"
+                placeholder="summonerToTrack#NA1"
+            />
+            <Button>Track New User</Button>
         </form>
 
         {
