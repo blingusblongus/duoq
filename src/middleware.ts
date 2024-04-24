@@ -22,7 +22,6 @@ export const onRequest = defineMiddleware(async (context, next) => {
 
     // Else we read cookie
     const summonerDetailsCookie = context.cookies.get("summonerDetails");
-    console.log(summonerDetailsCookie);
 
     // Redirect if missing
     if (!summonerDetailsCookie) {
