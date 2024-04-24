@@ -97,6 +97,7 @@ export async function POST(context: APIContext): Promise<Response> {
                 totalHeal: healing,
                 riotIdTagline,
                 totalDamageDealtToChampions: damage,
+                teamId,
             } of participants) {
                 summoner_queries.push(
                     db
@@ -129,6 +130,7 @@ export async function POST(context: APIContext): Promise<Response> {
                         damage,
                         individualPosition,
                         teamPosition,
+                        teamId,
                     }),
                 );
             }
