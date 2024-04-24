@@ -65,7 +65,7 @@ class MockRiotService extends RiotService {
                 }),
             );
         } catch (err) {
-            throw new Error("Match not found in examnples");
+            throw new Error("Match not found in examples, " + matchId);
         }
     }
 }

@@ -122,8 +122,8 @@ export async function POST(context: APIContext) {
             return new Response("Unhandled puuids.length: " + puuids.length);
     }
     console.time("lookup time");
-    const res = await db.run(sq).then((res) => res.rows);
+    const rows = await db.run(sq).then((res) => res.rows);
     console.timeEnd("lookup time");
 
-    return new Response(JSON.stringify(res));
+    return new Response(JSON.stringify(rows));
 }
