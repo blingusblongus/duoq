@@ -69,7 +69,10 @@ const Tracked_Duo_Visibility = defineTable({
         duo_id: column.number({ references: () => Tracked_Duo.columns.id }),
         visibleTo: column.text({ references: () => Summoner.columns.puuid }),
     },
-    indexes: [{ on: ["visibleTo"] }],
+    indexes: [
+        { on: ["visibleTo"] },
+        { on: ["visibleTo", "duo_id"], unique: true },
+    ],
 });
 
 export default defineDb({

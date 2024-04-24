@@ -51,7 +51,7 @@ export async function POST(context: APIContext) {
         ].sort();
 
         const existing = await db
-            .select()
+            .select({ duo_id: Tracked_Duo.id })
             .from(Tracked_Duo)
             .where(
                 and(
@@ -63,6 +63,10 @@ export async function POST(context: APIContext) {
 
         if (existing) {
             console.log("existing Tracked_Duo found:", existing);
+            await db
+                .insert(Tracked_Duo_Visibility)
+                .values({ duo_id: existing.duo_id, visibleTo: userPuuid })
+                .onConflictDoNothing();
             return context.redirect("/");
         }
 

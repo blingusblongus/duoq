@@ -1,5 +1,6 @@
 ---
 import Layout from "../layouts/Layout.astro";
+import TrackedDuos from "../components/TrackedDuos.astro";
 import { Button } from "../components/ui/button";
 import {
     Summoner,
@@ -47,7 +48,9 @@ if (puuid) {
     const sq = sql`
     SELECT 
         CONCAT(S1.game_name, '#', S1.tag_line) as summoner1, CONCAT(S2.game_name, '#', S2.tag_line) as summoner2, 
-        ${Tracked_Duo.won_matches}, ${Tracked_Duo.total_matches}
+        ${Tracked_Duo.won_matches}, 
+        ${Tracked_Duo.total_matches},
+        ${Tracked_Duo_Visibility.id}
     FROM ${Tracked_Duo_Visibility}
     INNER JOIN ${Tracked_Duo} ON ${Tracked_Duo_Visibility.duo_id} = ${Tracked_Duo.id}
     INNER JOIN ${Summoner} AS S1 ON S1.puuid = ${Tracked_Duo.summoner1}
@@ -84,34 +87,42 @@ if (puuid) {
 
             {
                 tracked_duos && (
-                    <div>
-                        {tracked_duos.map(
-                            ({
-                                summoner1,
-                                summoner2,
-                                won_matches,
-                                total_matches,
-                            }) => {
-                                const otherSumm =
-                                    summoner1 ===
-                                    user.gameName + "#" + user.tagLine
-                                        ? summoner2
-                                        : summoner1;
-                                const winrate =
-                                    typeof won_matches === "number" &&
-                                    typeof total_matches === "number"
-                                        ? (won_matches / total_matches).toFixed(
-                                              2,
-                                          )
-                                        : "unknkown";
-                                return (
-                                    <div>
-                                        {otherSumm} winrate: {winrate}
-                                    </div>
-                                );
-                            },
-                        )}
-                    </div>
+                    <TrackedDuos duos={tracked_duos} />
+                    // <div>
+                    //     {tracked_duos.map(
+                    //         ({
+                    //             summoner1,
+                    //             summoner2,
+                    //             won_matches,
+                    //             total_matches,
+                    //             id,
+                    //         }) => {
+                    //             const otherSumm =
+                    //                 summoner1 ===
+                    //                 user.gameName + "#" + user.tagLine
+                    //                     ? summoner2
+                    //                     : summoner1;
+                    //             const winrate =
+                    //                 typeof won_matches === "number" &&
+                    //                 typeof total_matches === "number"
+                    //                     ? (won_matches / total_matches).toFixed(
+                    //                           2,
+                    //                       )
+                    //                     : "unknkown";
+                    //             console.log(id);
+                    //             return (
+                    //                 <div class="flex">
+                    //                     <div>
+                    //                         {otherSumm} winrate: {winrate}
+                    //                     </div>
+                    //                     <form method="DELETE" action=`api/delete-duo-visibility/${id}`>
+                    //                         <Button>Delete</Button>
+                    //                     </form>
+                    //                 </div>
+                    //             );
+                    //         },
+                    //     )}
+                    // </div>
                 )
             }
         </div>
