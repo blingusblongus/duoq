@@ -1,0 +1,66 @@
+---
+import { Button } from "./ui/button";
+
+type TrackedDuoProps = {
+    duos: {
+        summoner1: string;
+        summoner2: string;
+        won_matches: number;
+        total_matches: number;
+        id: number;
+    }[];
+};
+const { duos } = Astro.props as TrackedDuoProps;
+// @ts-expect-error - env.d.ts issue
+const user = Astro.locals.user;
+---
+
+<>
+    {
+        duos.map(({ summoner1, summoner2, won_matches, total_matches, id }) => {
+            const otherSumm =
+                summoner1 === user.gameName + "#" + user.tagLine
+                    ? summoner2
+                    : summoner1;
+            const winrate =
+                typeof won_matches === "number" &&
+                typeof total_matches === "number"
+                    ? (won_matches / total_matches).toFixed(2)
+                    : "unknkown";
+            return (
+                <div class="flex">
+                    <div>
+                        {otherSumm} winrate: {winrate}
+                    </div>
+                    <Button id="delete-duo-btn" value={id}>
+                        Delete
+                    </Button>
+                </div>
+            );
+        })
+    }
+</>
+
+<script>
+    async function handleDelete(e) {
+        const id = e.target.value;
+        try {
+            const response = await fetch(`/api/duos/${id}`, {
+                method: "DELETE",
+            });
+
+            if (!response.ok) {
+                throw new Error("Failed to delete the item");
+            }
+
+            window.location.href = "/";
+        } catch (error) {
+            console.error("Error deleting item:", error);
+            alert("Error deleting item. Please try again.");
+        }
+    }
+
+    document
+        .getElementById("delete-duo-btn")
+        ?.addEventListener("click", handleDelete);
+</script>

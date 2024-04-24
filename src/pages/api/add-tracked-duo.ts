@@ -2,6 +2,7 @@ import { riotService } from "@/services/RiotService";
 import type { APIContext } from "astro";
 import {
     Tracked_Duo,
+    Tracked_Duo_Visibility,
     Summoner as Summoner_Table,
     db,
     eq,
@@ -12,6 +13,8 @@ import {
 export async function POST(context: APIContext) {
     const formData = await context.request.formData();
     const riotId = formData.get("riot-id") || "";
+    // @ts-expect-error - still haven't resolved this locals typing
+    const userPuuid = context.locals.user.puuid;
 
     if (typeof riotId !== "string") {
         return new Response("Invalid summoner name", { status: 400 });
@@ -48,7 +51,7 @@ export async function POST(context: APIContext) {
         ].sort();
 
         const existing = await db
-            .select()
+            .select({ duo_id: Tracked_Duo.id })
             .from(Tracked_Duo)
             .where(
                 and(
@@ -60,6 +63,10 @@ export async function POST(context: APIContext) {
 
         if (existing) {
             console.log("existing Tracked_Duo found:", existing);
+            await db
+                .insert(Tracked_Duo_Visibility)
+                .values({ duo_id: existing.duo_id, visibleTo: userPuuid })
+                .onConflictDoNothing();
             return context.redirect("/");
         }
 
@@ -81,7 +88,8 @@ export async function POST(context: APIContext) {
 
         const { total_matches, won_matches } = shared_matches[0];
 
-        const res = await db
+        // TODO: Combine these calls into a single query
+        const { id: insertedId } = await db
             .insert(Tracked_Duo)
             .values({
                 summoner1: s1,
@@ -89,9 +97,13 @@ export async function POST(context: APIContext) {
                 total_matches: total_matches || 0,
                 won_matches: won_matches || 0,
             })
-            .returning();
+            .returning({ id: Tracked_Duo.id })
+            .get();
 
-        console.log("Tracking added", res);
+        await db
+            .insert(Tracked_Duo_Visibility)
+            .values({ duo_id: insertedId, visibleTo: userPuuid });
+
         return context.redirect("/");
     } catch (err) {
         console.error(err);
