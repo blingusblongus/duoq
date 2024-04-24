@@ -71,7 +71,8 @@ if (puuid) {
         <Separator />
 
         <form method="POST" action="/api/duos">
-            <Input name="other-summoner" />
+            <Input name="summoner1" placeholder="summoner1" />
+            <Input name="summoner2" placeholder="summoner2" />
             <Button>Look Up Duo Stats Games</Button>
         </form>
 
@@ -91,46 +92,7 @@ if (puuid) {
                 <Button>Track New User</Button>
             </form>
 
-            {
-                tracked_duos && (
-                    <TrackedDuos duos={tracked_duos} />
-                    // <div>
-                    //     {tracked_duos.map(
-                    //         ({
-                    //             summoner1,
-                    //             summoner2,
-                    //             won_matches,
-                    //             total_matches,
-                    //             id,
-                    //         }) => {
-                    //             const otherSumm =
-                    //                 summoner1 ===
-                    //                 user.gameName + "#" + user.tagLine
-                    //                     ? summoner2
-                    //                     : summoner1;
-                    //             const winrate =
-                    //                 typeof won_matches === "number" &&
-                    //                 typeof total_matches === "number"
-                    //                     ? (won_matches / total_matches).toFixed(
-                    //                           2,
-                    //                       )
-                    //                     : "unknkown";
-                    //             console.log(id);
-                    //             return (
-                    //                 <div class="flex">
-                    //                     <div>
-                    //                         {otherSumm} winrate: {winrate}
-                    //                     </div>
-                    //                     <form method="DELETE" action=`api/delete-duo-visibility/${id}`>
-                    //                         <Button>Delete</Button>
-                    //                     </form>
-                    //                 </div>
-                    //             );
-                    //         },
-                    //     )}
-                    // </div>
-                )
-            }
+            {tracked_duos && <TrackedDuos duos={tracked_duos} />}
         </div>
 
         <Separator />
