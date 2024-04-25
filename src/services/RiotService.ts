@@ -29,8 +29,6 @@ class RiotService {
             throw new Error(`API call failed with status ${response.status}`);
         }
 
-        console.log(response);
-
         return response.json() as Promise<T>;
     }
 
