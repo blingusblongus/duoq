@@ -1,0 +1,10 @@
+---
+import Layout from "../layouts/Layout.astro";
+import { LookupForm } from "../components/LookupForm";
+---
+
+<Layout title="lookup">
+    <main class="flex h-full w-full flex-col items-center">
+        <LookupForm client:load />
+    </main>
+</Layout>
