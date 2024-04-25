@@ -36,7 +36,7 @@ if (puuid) {
         })
         .from(Summoner_Match)
         .where(eq(Summoner_Match.summonerId, puuid))
-        .limit(10)
+        .limit(30)
         .orderBy(desc(Summoner_Match.matchId));
 
     summonerStats = await db
