@@ -35,7 +35,9 @@ export async function POST(context: APIContext) {
             })
             .onConflictDoNothing();
     } catch (err) {
-        console.error(err);
+        if (err instanceof Error) {
+            return new Response(err.message);
+        }
     }
 
     if (!summonerDetails) {
