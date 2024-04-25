@@ -78,6 +78,20 @@ if (puuid) {
             <Button>Look up stats</Button>
         </form>
 
+        <form method="POST" action="/api/duos/byChampion">
+            <Input name="summoner1" placeholder="summoner1" />
+            <Input name="summoner2" placeholder="summoner2" />
+            <Input name="summoner3" placeholder="summoner3" />
+            <Input name="summoner4" placeholder="summoner4" />
+            <Button>Look up by Champion</Button>
+        </form>
+        <form method="POST" action="/api/duos/byChampionByPosition">
+            <Input name="summoner1" placeholder="summoner1" />
+            <Input name="summoner2" placeholder="summoner2" />
+            <Input name="summoner3" placeholder="summoner3" />
+            <Input name="summoner4" placeholder="summoner4" />
+            <Button>Look up by Champion and Position</Button>
+        </form>
         <Separator />
         <div class="flex flex-col gap-2">
             <h1 class="text-2xl font-extrabold">Tracked Users</h1>

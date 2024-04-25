@@ -47,6 +47,7 @@ const Summoner_Match = defineTable({
     indexes: [
         { on: ["summonerId", "matchId"] },
         { on: ["summonerId", "teamPosition"] },
+        { on: ["summonerId", "championName"] },
         { on: ["matchId", "teamId"] },
     ],
 });
