@@ -45,12 +45,13 @@ export async function POST(context: APIContext) {
                 COUNT(*) AS games_played,
                 COUNT(*) FILTER (WHERE s1.win = true) AS games_won,
                 COUNT(*) FILTER (WHERE s1.win = false) AS games_lost,
-                COUNT(*) FILTER (WHERE s1.win = true) * 1.0 / COUNT(*) AS win_rate
+                COUNT(*) FILTER (WHERE s1.win = true) * 1.0 / COUNT(*) AS win_rate,
+                (COUNT(*) FILTER (WHERE s1.win = true) + 1) * 1.0 / (COUNT(*) + 2) AS smoothed_win_rate  -- Laplace smoothing for sorting
                 FROM ${Summoner_Match} s1
                 JOIN ${Summoner_Match} s2 ON s1.matchId = s2.matchId AND s1.teamId = s2.teamId
                 WHERE s1.summonerId = ${puuids[0]} AND s2.summonerId = ${puuids[1]}
                 GROUP BY s1.teamPosition, s2.teamPosition
-                ORDER BY win_rate DESC`;
+                ORDER BY smoothed_win_rate DESC`;
             break;
         case 3:
             sq = sql`SELECT
@@ -60,7 +61,8 @@ export async function POST(context: APIContext) {
                 COUNT(*) AS games_played,
                 COUNT(*) FILTER (WHERE s1.win = true) AS games_won,  -- Assuming all are on the same team, if s1 wins, all win
                 COUNT(*) FILTER (WHERE s1.win = false) AS games_lost,
-                COUNT(*) FILTER (WHERE s1.win = true) * 1.0 / COUNT(*) AS win_rate
+                COUNT(*) FILTER (WHERE s1.win = true) * 1.0 / COUNT(*) AS win_rate,
+                (COUNT(*) FILTER (WHERE s1.win = true) + 1) * 1.0 / (COUNT(*) + 2) AS smoothed_win_rate  -- Laplace smoothing for sorting
                 FROM ${Summoner_Match} s1
                 JOIN ${Summoner_Match} s2 ON s1.matchId = s2.matchId AND s1.teamId = s2.teamId
                 JOIN ${Summoner_Match} s3 ON s1.matchId = s3.matchId AND s1.teamId = s3.teamId
@@ -69,7 +71,7 @@ export async function POST(context: APIContext) {
                     s2.summonerId = ${puuids[1]} AND 
                     s3.summonerId = ${puuids[2]}
                 GROUP BY teamPosition1, teamPosition2, teamPosition3
-                ORDER BY win_rate DESC`;
+                ORDER BY smoothed_win_rate DESC`;
             break;
         case 4:
             sq = sql`SELECT
@@ -80,7 +82,8 @@ export async function POST(context: APIContext) {
                 COUNT(*) AS games_played,
                 COUNT(*) FILTER (WHERE s1.win = true) AS games_won,  -- Assuming all are on the same team, if s1 wins, all win
                 COUNT(*) FILTER (WHERE s1.win = false) AS games_lost,
-                COUNT(*) FILTER (WHERE s1.win = true) * 1.0 / COUNT(*) AS win_rate
+                COUNT(*) FILTER (WHERE s1.win = true) * 1.0 / COUNT(*) AS win_rate,
+                (COUNT(*) FILTER (WHERE s1.win = true) + 1) * 1.0 / (COUNT(*) + 2) AS smoothed_win_rate  -- Laplace smoothing for sorting
                 FROM ${Summoner_Match} s1
                 JOIN ${Summoner_Match} s2 ON s1.matchId = s2.matchId AND s1.teamId = s2.teamId
                 JOIN ${Summoner_Match} s3 ON s1.matchId = s3.matchId AND s1.teamId = s3.teamId
@@ -91,7 +94,7 @@ export async function POST(context: APIContext) {
                     s3.summonerId = ${puuids[2]} AND
                     s4.summonerId = ${puuids[3]}
                 GROUP BY teamPosition1, teamPosition2, teamPosition3, teamPosition4
-                ORDER BY win_rate DESC`;
+                ORDER BY smoothed_win_rate DESC`;
             break;
         case 5:
             sq = sql`SELECT
@@ -103,7 +106,8 @@ export async function POST(context: APIContext) {
                 COUNT(*) AS games_played,
                 COUNT(*) FILTER (WHERE s1.win = true) AS games_won,  -- Assuming all are on the same team, if s1 wins, all win
                 COUNT(*) FILTER (WHERE s1.win = false) AS games_lost,
-                COUNT(*) FILTER (WHERE s1.win = true) * 1.0 / COUNT(*) AS win_rate
+                COUNT(*) FILTER (WHERE s1.win = true) * 1.0 / COUNT(*) AS win_rate,
+                (COUNT(*) FILTER (WHERE s1.win = true) + 1) * 1.0 / (COUNT(*) + 2) AS smoothed_win_rate  -- Laplace smoothing for sorting
                 FROM ${Summoner_Match} s1
                 JOIN ${Summoner_Match} s2 ON s1.matchId = s2.matchId AND s1.teamId = s2.teamId
                 JOIN ${Summoner_Match} s3 ON s1.matchId = s3.matchId AND s1.teamId = s3.teamId
@@ -116,7 +120,7 @@ export async function POST(context: APIContext) {
                     s4.summonerId = ${puuids[3]} AND
                     s5.summonerId = ${puuids[4]}
                 GROUP BY teamPosition1, teamPosition2, teamPosition3, teamPosition4, teamPosition5
-                ORDER BY win_rate DESC`;
+                ORDER BY smoothed_win_rate DESC`;
             break;
         default:
             return new Response("Unhandled puuids.length: " + puuids.length);
