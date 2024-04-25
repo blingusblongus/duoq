@@ -1,6 +1,6 @@
 import { riotService } from "@/services/RiotService";
 import type { APIContext } from "astro";
-import { sql, db, Summoner_Match } from "astro:db";
+import { sql, db, Summoner_Match, Match } from "astro:db";
 
 const LAPLACE_COEFFICIENT = 1;
 
@@ -51,7 +51,9 @@ export async function POST(context: APIContext) {
                 (COUNT(*) FILTER (WHERE s1.win = true) + 1) * ${LAPLACE_COEFFICIENT} / (COUNT(*) + ${2 * LAPLACE_COEFFICIENT}) AS smoothed_win_rate  -- Laplace smoothing for sorting
                 FROM ${Summoner_Match} s1
                 JOIN ${Summoner_Match} s2 ON s1.matchId = s2.matchId AND s1.teamId = s2.teamId
-                WHERE s1.summonerId = ${puuids[0]} AND s2.summonerId = ${puuids[1]}
+                JOIN ${Match} ON s1.matchId = ${Match.id} 
+                WHERE s1.summonerId = ${puuids[0]} AND s2.summonerId = ${puuids[1]} 
+                    AND ${Match.gameMode} = 'CLASSIC'
                 GROUP BY s1.championName, s2.championName
                 ORDER BY smoothed_win_rate DESC`;
             break;
@@ -68,10 +70,12 @@ export async function POST(context: APIContext) {
                 FROM ${Summoner_Match} s1
                 JOIN ${Summoner_Match} s2 ON s1.matchId = s2.matchId AND s1.teamId = s2.teamId
                 JOIN ${Summoner_Match} s3 ON s1.matchId = s3.matchId AND s1.teamId = s3.teamId
+                JOIN ${Match} ON s1.matchId = ${Match.id} 
                 WHERE 
                     s1.summonerId = ${puuids[0]} AND 
                     s2.summonerId = ${puuids[1]} AND 
                     s3.summonerId = ${puuids[2]}
+                    AND ${Match.gameMode} = 'CLASSIC'
                 GROUP BY championName1, championName2, championName3
                 ORDER BY smoothed_win_rate DESC`;
             break;
@@ -90,11 +94,13 @@ export async function POST(context: APIContext) {
                 JOIN ${Summoner_Match} s2 ON s1.matchId = s2.matchId AND s1.teamId = s2.teamId
                 JOIN ${Summoner_Match} s3 ON s1.matchId = s3.matchId AND s1.teamId = s3.teamId
                 JOIN ${Summoner_Match} s4 ON s1.matchId = s4.matchId AND s1.teamId = s4.teamId
+                JOIN ${Match} ON s1.matchId = ${Match.id} 
                 WHERE 
                     s1.summonerId = ${puuids[0]} AND 
                     s2.summonerId = ${puuids[1]} AND 
                     s3.summonerId = ${puuids[2]} AND
                     s4.summonerId = ${puuids[3]}
+                    AND ${Match.gameMode} = 'CLASSIC'
                 GROUP BY championName1, championName2, championName3, championName4
                 ORDER BY smoothed_win_rate DESC`;
             break;
@@ -115,12 +121,14 @@ export async function POST(context: APIContext) {
                 JOIN ${Summoner_Match} s3 ON s1.matchId = s3.matchId AND s1.teamId = s3.teamId
                 JOIN ${Summoner_Match} s4 ON s1.matchId = s4.matchId AND s1.teamId = s4.teamId
                 JOIN ${Summoner_Match} s5 ON s1.matchId = s5.matchId AND s1.teamId = s5.teamId
+                JOIN ${Match} ON s1.matchId = ${Match.id} 
                 WHERE 
                     s1.summonerId = ${puuids[0]} AND 
                     s2.summonerId = ${puuids[1]} AND 
                     s3.summonerId = ${puuids[2]} AND
                     s4.summonerId = ${puuids[3]} AND
                     s5.summonerId = ${puuids[4]}
+                    AND ${Match.gameMode} = 'CLASSIC'
                 GROUP BY championName1, championName2, championName3, championName4, championName5
                 ORDER BY smoothed_win_rate DESC`;
             break;
