@@ -21,6 +21,10 @@ class RiotService {
             headers: { "X-Riot-Token": this.apiKey },
         });
 
+        if (response.status === 403) {
+            throw new Error("API Key Expired");
+        }
+
         if (!response.ok) {
             throw new Error(`API call failed with status ${response.status}`);
         }
@@ -65,7 +69,7 @@ class MockRiotService extends RiotService {
                 }),
             );
         } catch (err) {
-            throw new Error("Match not found in examnples");
+            throw new Error("Match not found in examples, " + matchId);
         }
     }
 }

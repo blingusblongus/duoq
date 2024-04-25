@@ -36,7 +36,7 @@ if (puuid) {
         })
         .from(Summoner_Match)
         .where(eq(Summoner_Match.summonerId, puuid))
-        .limit(10)
+        .limit(30)
         .orderBy(desc(Summoner_Match.matchId));
 
     summonerStats = await db
@@ -70,6 +70,29 @@ if (puuid) {
 
         <Separator />
 
+        <form method="POST" action="/api/duos">
+            <Input name="summoner1" placeholder="summoner1" />
+            <Input name="summoner2" placeholder="summoner2" />
+            <Input name="summoner3" placeholder="summoner3" />
+            <Input name="summoner4" placeholder="summoner4" />
+            <Button>Look up stats</Button>
+        </form>
+
+        <form method="POST" action="/api/duos/byChampion">
+            <Input name="summoner1" placeholder="summoner1" />
+            <Input name="summoner2" placeholder="summoner2" />
+            <Input name="summoner3" placeholder="summoner3" />
+            <Input name="summoner4" placeholder="summoner4" />
+            <Button>Look up by Champion</Button>
+        </form>
+        <form method="POST" action="/api/duos/byChampionByPosition">
+            <Input name="summoner1" placeholder="summoner1" />
+            <Input name="summoner2" placeholder="summoner2" />
+            <Input name="summoner3" placeholder="summoner3" />
+            <Input name="summoner4" placeholder="summoner4" />
+            <Button>Look up by Champion and Position</Button>
+        </form>
+        <Separator />
         <div class="flex flex-col gap-2">
             <h1 class="text-2xl font-extrabold">Tracked Users</h1>
             <form
@@ -85,46 +108,7 @@ if (puuid) {
                 <Button>Track New User</Button>
             </form>
 
-            {
-                tracked_duos && (
-                    <TrackedDuos duos={tracked_duos} />
-                    // <div>
-                    //     {tracked_duos.map(
-                    //         ({
-                    //             summoner1,
-                    //             summoner2,
-                    //             won_matches,
-                    //             total_matches,
-                    //             id,
-                    //         }) => {
-                    //             const otherSumm =
-                    //                 summoner1 ===
-                    //                 user.gameName + "#" + user.tagLine
-                    //                     ? summoner2
-                    //                     : summoner1;
-                    //             const winrate =
-                    //                 typeof won_matches === "number" &&
-                    //                 typeof total_matches === "number"
-                    //                     ? (won_matches / total_matches).toFixed(
-                    //                           2,
-                    //                       )
-                    //                     : "unknkown";
-                    //             console.log(id);
-                    //             return (
-                    //                 <div class="flex">
-                    //                     <div>
-                    //                         {otherSumm} winrate: {winrate}
-                    //                     </div>
-                    //                     <form method="DELETE" action=`api/delete-duo-visibility/${id}`>
-                    //                         <Button>Delete</Button>
-                    //                     </form>
-                    //                 </div>
-                    //             );
-                    //         },
-                    //     )}
-                    // </div>
-                )
-            }
+            {tracked_duos && <TrackedDuos duos={tracked_duos} />}
         </div>
 
         <Separator />

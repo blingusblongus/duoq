@@ -42,8 +42,14 @@ const Summoner_Match = defineTable({
         damage: column.number(),
         individualPosition: column.text(),
         teamPosition: column.text(),
+        teamId: column.number(),
     },
-    indexes: [{ on: ["summonerId", "matchId"] }],
+    indexes: [
+        { on: ["summonerId", "matchId"] },
+        { on: ["summonerId", "teamPosition"] },
+        { on: ["summonerId", "championName"] },
+        { on: ["matchId", "teamId"] },
+    ],
 });
 
 const Tracked_Duo = defineTable({

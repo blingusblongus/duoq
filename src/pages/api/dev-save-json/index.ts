@@ -7,10 +7,15 @@ import fs from "fs";
  * to populate local files for mocking the riot API
  */
 export async function GET(context: APIContext) {
+    console.log("hitting dev-save-json");
     // Disable route for PROD
     if (import.meta.env.PROD) {
         return new Response("Resource not found", { status: 404 });
     }
+
+    const url = new URL(context.request.url);
+    const count = url.searchParams.get("count");
+    const start = url.searchParams.get("start");
 
     // Fetch Latest games
     // @ts-expect-error - for some reason, even changing declaration file doesn't seem to be fixing locals typing
@@ -21,7 +26,11 @@ export async function GET(context: APIContext) {
     const { puuid } = context.locals.user as Summoner;
 
     const destPath = "db/examples/matches/";
-    const matches = await riotService.getMatchIds(puuid, 0, 10);
+    const matches = await riotService.getMatchIds(
+        puuid,
+        parseInt(start || "0") || 0,
+        parseInt(count || "0") || 10,
+    );
 
     if (!matches || matches.length === 0) {
         console.log("no matches. puuid:", puuid);
@@ -46,7 +55,7 @@ export async function GET(context: APIContext) {
                 fs.writeFile(
                     destPath + match + ".json",
                     JSON.stringify(res, null, 0),
-                    (err) => console.error(err),
+                    (err) => err && console.error(err),
                 );
             } else {
                 console.log(match, "already downloaded");
