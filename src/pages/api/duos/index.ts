@@ -2,6 +2,8 @@ import { riotService } from "@/services/RiotService";
 import type { APIContext } from "astro";
 import { sql, db, Summoner_Match } from "astro:db";
 
+const LAPLACE_COEFFICIENT = 1;
+
 const validateSummoner = async (fullName: FormDataEntryValue) => {
     if (!fullName) throw Error("Summoner name is null");
 
@@ -45,8 +47,8 @@ export async function POST(context: APIContext) {
                 COUNT(*) AS games_played,
                 COUNT(*) FILTER (WHERE s1.win = true) AS games_won,
                 COUNT(*) FILTER (WHERE s1.win = false) AS games_lost,
-                COUNT(*) FILTER (WHERE s1.win = true) * 1.0 / COUNT(*) AS win_rate,
-                (COUNT(*) FILTER (WHERE s1.win = true) + 1) * 1.0 / (COUNT(*) + 2) AS smoothed_win_rate  -- Laplace smoothing for sorting
+                COUNT(*) FILTER (WHERE s1.win = true) * ${LAPLACE_COEFFICIENT} / COUNT(*) AS win_rate,
+                (COUNT(*) FILTER (WHERE s1.win = true) + 1) * ${LAPLACE_COEFFICIENT} / (COUNT(*) + ${2 * LAPLACE_COEFFICIENT}) AS smoothed_win_rate  -- Laplace smoothing for sorting
                 FROM ${Summoner_Match} s1
                 JOIN ${Summoner_Match} s2 ON s1.matchId = s2.matchId AND s1.teamId = s2.teamId
                 WHERE s1.summonerId = ${puuids[0]} AND s2.summonerId = ${puuids[1]}
@@ -61,8 +63,8 @@ export async function POST(context: APIContext) {
                 COUNT(*) AS games_played,
                 COUNT(*) FILTER (WHERE s1.win = true) AS games_won,  -- Assuming all are on the same team, if s1 wins, all win
                 COUNT(*) FILTER (WHERE s1.win = false) AS games_lost,
-                COUNT(*) FILTER (WHERE s1.win = true) * 1.0 / COUNT(*) AS win_rate,
-                (COUNT(*) FILTER (WHERE s1.win = true) + 1) * 1.0 / (COUNT(*) + 2) AS smoothed_win_rate  -- Laplace smoothing for sorting
+                COUNT(*) FILTER (WHERE s1.win = true) * ${LAPLACE_COEFFICIENT} / COUNT(*) AS win_rate,
+                (COUNT(*) FILTER (WHERE s1.win = true) + 1) * ${LAPLACE_COEFFICIENT} / (COUNT(*) + ${2 * LAPLACE_COEFFICIENT}) AS smoothed_win_rate  -- Laplace smoothing for sorting
                 FROM ${Summoner_Match} s1
                 JOIN ${Summoner_Match} s2 ON s1.matchId = s2.matchId AND s1.teamId = s2.teamId
                 JOIN ${Summoner_Match} s3 ON s1.matchId = s3.matchId AND s1.teamId = s3.teamId
@@ -82,8 +84,8 @@ export async function POST(context: APIContext) {
                 COUNT(*) AS games_played,
                 COUNT(*) FILTER (WHERE s1.win = true) AS games_won,  -- Assuming all are on the same team, if s1 wins, all win
                 COUNT(*) FILTER (WHERE s1.win = false) AS games_lost,
-                COUNT(*) FILTER (WHERE s1.win = true) * 1.0 / COUNT(*) AS win_rate,
-                (COUNT(*) FILTER (WHERE s1.win = true) + 1) * 1.0 / (COUNT(*) + 2) AS smoothed_win_rate  -- Laplace smoothing for sorting
+                COUNT(*) FILTER (WHERE s1.win = true) * ${LAPLACE_COEFFICIENT} / COUNT(*) AS win_rate,
+                (COUNT(*) FILTER (WHERE s1.win = true) + 1) * ${LAPLACE_COEFFICIENT} / (COUNT(*) + ${2 * LAPLACE_COEFFICIENT}) AS smoothed_win_rate  -- Laplace smoothing for sorting
                 FROM ${Summoner_Match} s1
                 JOIN ${Summoner_Match} s2 ON s1.matchId = s2.matchId AND s1.teamId = s2.teamId
                 JOIN ${Summoner_Match} s3 ON s1.matchId = s3.matchId AND s1.teamId = s3.teamId
@@ -106,8 +108,8 @@ export async function POST(context: APIContext) {
                 COUNT(*) AS games_played,
                 COUNT(*) FILTER (WHERE s1.win = true) AS games_won,  -- Assuming all are on the same team, if s1 wins, all win
                 COUNT(*) FILTER (WHERE s1.win = false) AS games_lost,
-                COUNT(*) FILTER (WHERE s1.win = true) * 1.0 / COUNT(*) AS win_rate,
-                (COUNT(*) FILTER (WHERE s1.win = true) + 1) * 1.0 / (COUNT(*) + 2) AS smoothed_win_rate  -- Laplace smoothing for sorting
+                COUNT(*) FILTER (WHERE s1.win = true) * ${LAPLACE_COEFFICIENT} / COUNT(*) AS win_rate,
+                (COUNT(*) FILTER (WHERE s1.win = true) + 1) * ${LAPLACE_COEFFICIENT} / (COUNT(*) + ${2 * LAPLACE_COEFFICIENT}) AS smoothed_win_rate  -- Laplace smoothing for sorting
                 FROM ${Summoner_Match} s1
                 JOIN ${Summoner_Match} s2 ON s1.matchId = s2.matchId AND s1.teamId = s2.teamId
                 JOIN ${Summoner_Match} s3 ON s1.matchId = s3.matchId AND s1.teamId = s3.teamId
